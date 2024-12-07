@@ -45,9 +45,7 @@
             ON U.account = D.account
         WHERE B.status = 'A'
             AND B.category_id = 2
-            AND (U.nickname LIKE CONCAT('%', #{s.keyword}, '%')
-            OR B.content  LIKE CONCAT('%', #{s.keyword}, '%'))
-<!--        <include refid="search" />-->
+        <include refid="search" />
         <include refid="sort"/>
         LIMIT #{s.pageStart}, #{s.amount}
     </select>
@@ -69,7 +67,7 @@
         LIMIT #{s.pageStart}, #{s.amount}
     </select>
 
-    <select id="findFeedById" resultType="com.travel.project.dto.request.FeedFindOneDto">
+    <select id="findFeedById" resultType="com.travel.project.dto.response.FeedFindOneDto">
         SELECT
             B.board_id,
             B.account,

@@ -1,7 +1,5 @@
-package com.travel.project.dto.request;
+package com.travel.project.dto.response;
 
-import com.travel.project.dto.response.FeedDetailDto;
-import com.travel.project.dto.response.MyFeedDto;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 

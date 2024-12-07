@@ -1,8 +1,8 @@
 package com.travel.project.mapper;
 
 import com.travel.project.common.Search;
-import com.travel.project.dto.request.FeedFindAllDto;
-import com.travel.project.dto.request.FeedFindOneDto;
+import com.travel.project.dto.response.FeedFindAllDto;
+import com.travel.project.dto.response.FeedFindOneDto;
 import com.travel.project.entity.Board;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

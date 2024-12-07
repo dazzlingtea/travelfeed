@@ -3,8 +3,8 @@ package com.travel.project.service;
 import com.travel.project.common.Page;
 import com.travel.project.common.PageMaker;
 import com.travel.project.common.Search;
-import com.travel.project.dto.request.FeedFindAllDto;
-import com.travel.project.dto.request.FeedFindOneDto;
+import com.travel.project.dto.response.FeedFindAllDto;
+import com.travel.project.dto.response.FeedFindOneDto;
 import com.travel.project.dto.request.FeedModifyDto;
 import com.travel.project.dto.request.FeedPostDto;
 import com.travel.project.dto.response.*;
@@ -45,12 +45,10 @@ public class FeedService {
         if (feedList.isEmpty()) {
             return null;
         }
-        // 각 피드마다 이미지 리스트를 추가
-        // 각 피드마다 댓글 수, 좋아요 수, 북마크 수 추가
-
-        List<FeedDetailDto> detailDto = feedList.stream()
+        // 각 피드마다 이미지, 댓글 수, 좋아요 수, 북마크 수 추가
+        List<FeedDetailDto> listDto = feedList.stream()
             .map(f -> {
-                log.debug("전체조회 - 피드서비스 f: {}", f);
+                log.debug("전체조회 - 피드서비스 : {}", f);
                 FeedDetailDto responseDto = f.toDetailDto();
                 responseDto.setContent(formatContent(changeEol(f.getContent()))); // content 변경
 
@@ -76,12 +74,10 @@ public class FeedService {
             })
             .collect(Collectors.toList());
 
-
         return FeedListDto.builder()
                 .pageInfo(new PageMaker(page, getCount(search)))
-                .feeds(detailDto)
+                .feeds(listDto)
                 .build();
-
     }
 
     // 피드 상세 조회 - 글 번호로
@@ -102,9 +98,7 @@ public class FeedService {
             responseDto.setFeedImageList(feedImages);
         }
 
-        // 조회된 이미지 없으면 바로 리턴
         return responseDto;
-
     }
 
     // 새로운 피드(post DTO)를 tbl_board insert 시도
@@ -113,8 +107,6 @@ public class FeedService {
     // 피드 & 이미지 insert 실패하면 -1 리턴
     @Transactional
     public long insertFeed(FeedPostDto newFeed, HttpSession session) {
-
-        // 로그인 유틸에서 세션으로 계정 정보 가져오기
 
         Board board = Board.builder()
                 .content(newFeed.getContent())
@@ -166,7 +158,7 @@ public class FeedService {
             Board newBoard = dto.toBoardEntity();
             boolean bFlag = feedMapper.modifyFeed(newBoard);
             if (!bFlag) {
-                log.debug("게시글 디버그: ", newBoard);
+                log.debug("게시글 디버그: {}", newBoard);
                 throw new RuntimeException("피드 수정 - 글 수정 저장에 실패했습니다.");
             }
 

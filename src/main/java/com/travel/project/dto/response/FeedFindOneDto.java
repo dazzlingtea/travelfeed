@@ -1,6 +1,5 @@
-package com.travel.project.dto.request;
+package com.travel.project.dto.response;
 
-import com.travel.project.dto.response.FeedDetailDto;
 import lombok.*;
 
 import java.time.LocalDateTime;
