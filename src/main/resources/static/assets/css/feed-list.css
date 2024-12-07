@@ -99,9 +99,13 @@ body {
 .content-section {
     padding: 12px;
 }
-.content-section .show-detail:hover {
+.content-section .show-detail {
     color: #007bff;
+}
+
+.content-section .show-detail:hover {
     text-decoration-line: underline;
+    cursor: pointer;
 }
 
 .interaction-section {
@@ -349,14 +353,11 @@ body div.btn-container {
     background: rgba(0, 0, 0, 0.1);
 }
 .image-frame {
-
     padding: 2px;
-
 }
 .image-item {
     width: 100px;
     height: 100px;
-
     object-fit: cover;
 }
 /* 모달 속 이미지 미리보기 끝 */
@@ -694,7 +695,7 @@ body div.btn-container {
 /* textarea 글자수 */
 .typing-text {
     padding-left: 10px;
-    color: rgba(204, 204, 204, 0.9);
+    color: rgba(121, 121, 121, 0.9);
     font-size: 0.9rem;
 }
 /* 스피너 */

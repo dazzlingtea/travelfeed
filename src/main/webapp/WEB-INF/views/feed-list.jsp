@@ -65,7 +65,7 @@
             <label for="cr-nickname">닉네임</label>
             <input type="text" id="cr-nickname" name="nickname" required value="${user.nickname}" readonly>
             <label for="cr-content">내용</label>
-            <span class="typing-text"> <span class="typing-count">0</span>/50</span> <span class="typing-text hidden">최대 4줄 또는 50자까지 입력 가능합니다.</span>
+            <span class="typing-text"> <span class="typing-count">0</span>/50</span> <span class="typing-text txt-msg hidden">최대 4줄 또는 50자까지 입력 가능합니다.</span>
             <textarea id="cr-content" name="content" rows="4" placeholder="최대 4줄 또는 50자까지 입력 가능합니다." required></textarea>
             <label for="postImage" class="fake-upload">+ 이미지 업로드</label>
             <span class="typing-text img-msg">최대 10장까지 업로드 가능합니다.</span>
@@ -85,7 +85,7 @@
             <label for="ed-nickname">닉네임</label>
             <input type="text" id="ed-nickname" name="nickname" required readonly>
             <label for="ed-content">내용</label>
-            <span class="typing-text"> <span class="typing-count">0</span>/50</span>
+            <span class="typing-text"> <span class="typing-count">0</span>/50</span> <span class="typing-text txt-msg hidden">최대 4줄 또는 50자까지 입력 가능합니다.</span>
             <textarea type="text" id="ed-content" name="nickname" rows="4" placeholder="최대 4줄 또는 50자까지 입력 가능합니다." required></textarea>
             <label for="editPostImage" class="fake-upload">+ 이미지 업로드</label>
             <span class="typing-text img-msg">최대 10장까지 업로드 가능합니다.</span>
@@ -123,7 +123,6 @@
             </div>
             <div class="detail-content">
                 <p>
-                    <%--            Some description or content goes here...--%>
                 </p>
             </div>
             <!-- 댓글 영역 -->

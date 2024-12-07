@@ -4,28 +4,28 @@ export let imageFiles = [];
 const dataTransfer = new DataTransfer();
 
 // 이미지 배열 순서대로 미리보기 렌더링
-function readFile(file, index, imageBox) {
-
+function updatePreview(file, index) {
   const imgUrl = URL.createObjectURL(file);
-  const imgTag = `
-        <div class="image-frame" data-img-src="${imgUrl}"> 
-            <img src="${imgUrl}" class="image-item" data-image-order="${index}" alt="preview image">
+  return `
+        <div class="image-frame"> 
+            <img src="${imgUrl}" class="image-item" alt="preview image">
             <div class="delete-prev-image" data-image-order="${index}">취소</div>
         </div>
   `;
-  imageBox.innerHTML += imgTag;
 }
 
 
 // input 업로드된 파일 미리보기 렌더링 함수
 // imageBox는 미리보기 이미지가 렌더링될 DOM
 export function previewImages(files, imageBox) {
-  imageBox.innerHTML = ''; // 기존 미리보기 초기화
+  // imageBox.innerHTML = ''; // 기존 미리보기 초기화
+  let tagString = '';
   if(!files) return; // 업로드 할 이미지가 없으면 종료
 
   for (let i = 0; i < files.length; i++) {
-    readFile(files[i], i, imageBox);
+    tagString += updatePreview(files[i], i);
   }
+  imageBox.innerHTML = tagString;
 }
 
 function getOriginalFileName(url) {
@@ -37,7 +37,8 @@ function getOriginalFileName(url) {
 // 기존 이미지를 파일로 변환하여 imageFiles에 추가하고 미리보기로 렌더링하는 함수
 // images는 img 태그의 src 배열
 export async function addExistingImagesToPreview(images, imageBox) {
-  imageBox.innerHTML = ''; // 기존 미리보기 초기화
+  // imageBox.innerHTML = ''; // 기존 미리보기 초기화
+  let tagString = '';
   imageFiles = []; // 이미지 배열 초기화
 
   for (let i = 0; i < images.length; i++) {
@@ -46,30 +47,24 @@ export async function addExistingImagesToPreview(images, imageBox) {
     const blob = await res.blob();
     const file = new File([blob], getOriginalFileName(src), { type: blob.type });
     imageFiles.push(file);
-    readFile(file, i, imageBox);
+    tagString += updatePreview(file, i);
   }
-
+  imageBox.innerHTML = tagString;
   console.log('기존미리보기 imageFiles: ', imageFiles)
 }
 
-// 이미지 input(e) 변경 시 미리보기 및 이미지 배열 생성
-export function handleFileInputChange(e, imageList, imageBox) {
-  if(imageList.length === 10) {
-    document.querySelector('.fake-upload + .typing-text').classList.add('strong');
-    return;
-  } else {
-    document.querySelector('.fake-upload + .typing-text').classList.remove('strong');
-  }
-
-  imageList.push(...e.target.files);
-  console.log('image.js handle 이미지들 : ', imageList);
-  previewImages(imageList, imageBox);
+// 이미지 input 변경 시 미리보기 및 이미지 배열 생성
+export function handleFileInputChange(e, imageArray, imageBox) {
+  console.log(e.target.files)
+  imageArray.push(...e.target.files);
+  console.log('image.js handle 이미지들 : ', imageArray);
+  previewImages(imageArray, imageBox);
   e.target.value = '';
-  return imageList;
+  return imageArray;
 }
 
 // 게시글 작성, 수정(이미지 포함) FormData에 담는 함수
-// data: FormData에 담아야 할 객체 (ex. {title:'', content:''})
+// data: FormData에 담아야 할 객체 (ex. {content:''})
 export function dataToFormData(data, imageList) {
   const formData = new FormData();
   for (const key in data) {
@@ -125,9 +120,9 @@ function makeImgTag(imagePath, className, index) {
 
 // 캐러셀에 추가할 이미지 태그를 문자열로 반환하는 함수
 // images: 이미지 배열
-// className: img태그의 클래스
+// className: img 태그의 클래스
 // boardId: 글번호
-// delimit: 구분자 (다른 캐러셀과 구분하기 위해)
+// delimit: 캐러셀 구분자
 // -> carousel + 구분자 + 글번호 형태로 중복 방지
 export function renderCarousel(images, className, boardId, delimit) {
   let tagImg = '';
@@ -168,10 +163,11 @@ export function clearImageFiles() {
   imageFiles = [];
 }
 
-// preview 삭제 후 업데이트
-export function deletePreviewAndUpdate(e, $box) {
+// preview 삭제
+export function deletePreview(e, $box) {
   const index = +e.target.dataset.imageOrder;
-  const imgSrc = e.target.closest('.image-frame').dataset.imgSrc;
+  const imgFrame = e.target.closest('.image-frame');
+  const imgSrc = imgFrame.firstElementChild.src;
   imageFiles.splice(index, 1);
 
   // url 해제
@@ -179,5 +175,11 @@ export function deletePreviewAndUpdate(e, $box) {
   // DataTransfer 에서 파일 제거
   dataTransfer.items.remove(index);
   console.log('미리보기삭제이벤 imageFiles: ', imageFiles);
-  previewImages(imageFiles, $box);
+  imgFrame?.remove();
+
+  // 남아있는 모든 미리보기 프레임의 dataset.imageOrder 값 업데이트
+  const remainingFrames = $box.querySelectorAll('.image-frame');
+  remainingFrames.forEach((frame, i) => {
+    frame.querySelector('.delete-prev-image').dataset.imageOrder = i;
+  });
 }

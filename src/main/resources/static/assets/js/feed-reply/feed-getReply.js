@@ -64,7 +64,7 @@ export function appendReplies({ replies, loginUser }, reset = false) {
                 <div class='row user-block' style="margin-top: 20px; margin-left: 5px">
                   <div class='reply-head' style="height: 60px;">
                     <div class="profile-box">
-                          <img src="${profileImage ? profileImage : "/assets/img/mimo.png"}" alt="profileImage image" style="border-radius: 50%;">
+                          <img src="${profileImage ? profileImage : "/assets/img/anonymous.jpg"}" alt="profileImage image" style="border-radius: 50%;">
                     </div>
                     <div class="reply-body">
                       <div class='col-md-3'>

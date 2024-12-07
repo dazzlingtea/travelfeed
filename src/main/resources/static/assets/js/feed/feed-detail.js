@@ -34,18 +34,16 @@ function setDetailModal(dto) {
 
   const $btnContainer = document.getElementById('detail-update-btn');
   $btnContainer.innerHTML = '';
-  // 로그인 유저 = 피드 작성자 일때 수정, 삭제 버튼 렌더링
+  // 로그인 유저가 작성자 또는 관리자일 때 수정, 삭제 버튼 렌더링
   if( mine === true || admin === true ) {
-    const btnTag = `
+    $btnContainer.innerHTML = `
     <button class="edit-feed detail-set-btn" id="editFeedBtn">수정</button>
     <button class="delete-feed detail-set-btn" id="deleteFeedBtn">삭제</button>`;
-    $btnContainer.innerHTML = btnTag;
-//    <button class="delete-feed detail-set-btn" id="deleteFeedBtn" data-bs-toggle="modal" data-bs-target="#deleteFeedModal">삭제</button>`;
   }
   console.log('디테일: ',mine === true,' / ', admin === true,' / ',loginAccount);
 }
 
-// 서버로 boardId 보내서 fetch로 데이터 받아와서 모달에 렌더링
+// fetch 피드 상세 조회
 export async function fetchFeedDetail(boardId) {
 
   const url = `${FEED_URL}/v1/${boardId}`

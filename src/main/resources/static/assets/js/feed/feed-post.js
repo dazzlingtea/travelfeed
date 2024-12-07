@@ -2,6 +2,7 @@ import {FEED_URL} from "../feed-list.js";
 import {imageFiles as importedImageFiles } from "../image.js";
 import {fetchFeedDetail} from "./feed-detail.js";
 import {fetchFeedList} from "./feed-getList.js";
+import {initInfScroll} from "../feed-reply/feed-getReply.js";
 
 const createFeedModal = document.getElementById('createFeedModal')
 // const $feedPostBtn = document.getElementById('feed-post-Btn')
@@ -18,6 +19,7 @@ function openDetailModal(newBoardId) {
 
     fetchFeedList();
     fetchFeedDetail(newBoardId);
+    initInfScroll(newBoardId);
     detailModal.style.display = "block";
 }
 
@@ -39,15 +41,12 @@ export const fetchFeedPost = async (payload) => {
         if (res.ok) {
             const result = await res.json();
 
-            console.log('fetch 이후: ', result)
+            console.log('fetchFeedPost 이후: ', result);
 
             document.getElementById('createFeedModal').style.display = 'none';
-            // formData = new FormData(); // FormData 초기화
             imageFiles = []; // 파일 리스트 초기화
-            // document.getElementById('createFeedForm').reset();
             $imageBox.innerHTML = '';
 
-            // alert('게시글이 성공적으로 등록되었습니다.');
             const newBoardId = result.boardId;
             openDetailModal(newBoardId);
 
