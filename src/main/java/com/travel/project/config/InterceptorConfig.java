@@ -42,5 +42,9 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**"); // 모든 경로
 
 
+        // 피드 인터셉터
+        registry
+                .addInterceptor(feedInterceptor)
+                .addPathPatterns("/feed/v1/**");
     }
 }
