@@ -2,20 +2,17 @@ package com.travel.project.controller;
 
 import com.travel.project.common.Page;
 import com.travel.project.common.Search;
-import com.travel.project.dto.request.FeedFindOneDto;
+import com.travel.project.dto.response.FeedFindOneDto;
 import com.travel.project.dto.request.FeedModifyDto;
 import com.travel.project.dto.request.FeedPostDto;
 import com.travel.project.dto.response.*;
 import com.travel.project.login.LoginUtil;
 import com.travel.project.mapper.FeedMapper;
-import com.travel.project.service.BookmarkService;
-import com.travel.project.service.FeedService;
-import com.travel.project.service.LikeService;
+import com.travel.project.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,7 +41,6 @@ public class FeedController {
             @RequestParam(name = "sort", defaultValue = "latest", required = false) String sort
             , HttpSession session
     ) {
-        //  log.debug("겟: " + pageNo + "-" + type + "-" + keyword);
         Search page = new Search(new Page(pageNo, 5), type, keyword);
         page.setKeyword(keyword);
         page.setType(type);
@@ -53,15 +49,12 @@ public class FeedController {
         FeedListDto feeds = feedService.findAll(page, session, sort);
 
         // 조회 결과가 없는 경우
-        if(feeds == null && !keyword.isEmpty()) { // 검색 키워드가 존재하면 검색결과가 없는 경우
+        if (feeds == null && !keyword.isEmpty()) { // 검색 키워드가 존재하지만 검색결과가 없는 경우
             return ResponseEntity.noContent().build();
-        } else if(feeds == null) { // 검색 키워드가 없다면
+        } else if (feeds == null) { // 검색 키워드가 없다면
             return ResponseEntity.noContent().build();
         }
-//        log.debug("서비스결과: {}",feeds);
         feeds.setLoginUser(LoginUtil.getLoggedInUser(session));
-
-//        log.debug("FeedListDto: {}", feeds.getFeeds().get(0));
 
         return ResponseEntity.ok().body(feeds);
     }
@@ -96,29 +89,16 @@ public class FeedController {
     @ResponseBody
     public ResponseEntity<?> makeNewFeed(
             @RequestPart("content") String content,
-            @RequestPart("account") String account,
             @RequestPart("images") List<MultipartFile> images
-            , BindingResult bindingResult
             , HttpSession session
     ) {
-        log.debug("POST 컨트롤러 계정: {}", account);
-        LoginUserInfoDto user = (LoginUserInfoDto) session.getAttribute("user");
-        log.debug("POST 세션 계정: {}", user.getAccount());
-        if (!account.equals(user.getAccount())) {
-            return ResponseEntity.badRequest().body("계정 불일치");
-        }
+        String loginAccount = LoginUtil.getLoggedInUserAccount(session);
         FeedPostDto dto = FeedPostDto.builder()
-                .account(account)
+                .account(loginAccount)
                 .content(content)
                 .images(images)
                 .build();
 
-        if (bindingResult.hasErrors()) {
-            // 에러 메세지 Map 필요
-            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
-        }
-
-        // tbl_board 생성된 데이터의 boardId를 가져옴 (실패 시 RuntimeException)
         long newBoardId = feedService.insertFeed(dto, session);
         if (newBoardId < 0) {
             return ResponseEntity
@@ -130,7 +110,7 @@ public class FeedController {
                 .ok().body(feedService.findById(newBoardId));
     }
 
-    // 수정 - 수정한 내용을 JSON으로 받도록 수정해야 함
+    // 수정
     @RequestMapping(value = "/{boardId}", method = {RequestMethod.PUT, RequestMethod.PATCH})
     public ResponseEntity<?> updateFeed(
             @PathVariable long boardId,
@@ -173,7 +153,7 @@ public class FeedController {
 
         FeedListDto feeds = feedService.deleteFeed(boardId, session);
         log.debug("컨트롤러 피드삭제 번호: {}", boardId);
-        return ResponseEntity.ok().body(feeds); // list로 리다이렉트?
+        return ResponseEntity.ok().body(feeds);
     }
 
     // 좋아요 요청 비동기 처리

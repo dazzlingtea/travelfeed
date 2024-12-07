@@ -2,6 +2,8 @@ import {debounce} from "../util.js";
 
 const $myFeedBtn = document.getElementById('my-feed-btn');
 const $myBoardBtn = document.getElementById('my-board-btn');
+const $feedTab = document.getElementById('my-feed-tab');
+const $boardTab = document.getElementById('my-board-tab');
 
 let currentMyFeedPage = 1; // 현재 무한스크롤시 진행되고 있는 페이지 번호
 let isFetchingMyFeed = false; // 데이터 불러오는 중에는 더 가져오지 않게 제어하기 위한 논리변수
@@ -10,8 +12,6 @@ let loadedMyFeeds = 0;  // 로딩된 게시글 수
 
 // 마이페이지 동행 탭 닫고 피드 탭 열기
 function openFeedTab(account) {
-  const $feedTab = document.getElementById('my-feed-tab');
-  const $boardTab = document.getElementById('my-board-tab');
   fetchMyFeedList(account);
   $boardTab.classList.add('inactive-tab');
   $boardTab.classList.remove('active-tab')
@@ -22,10 +22,6 @@ function openFeedTab(account) {
   $myFeedBtn.classList.add('active-tab-btn');
 }
 function openBoardTab(account) {
-  const $feedTab = document.getElementById('my-feed-tab');
-  const $boardTab = document.getElementById('my-board-tab');
-  console.log('openBoardTab 실행!')
-  fetchMyFeedList(account);
   $feedTab.classList.add('inactive-tab');
   $feedTab.classList.remove('active-tab');
   $myFeedBtn.classList.remove('active-tab-btn');
@@ -38,7 +34,6 @@ function openBoardTab(account) {
 // 피드 탭 열기 이벤트
 $myFeedBtn.addEventListener('click', e => {
   const account = $myFeedBtn.dataset.myAccount
-  console.log('마이페이지 피드 클릭!')
   openFeedTab(account);
 });
 $myBoardBtn.addEventListener('click', e => {
@@ -59,7 +54,7 @@ function appendMyFeeds(myFeedListDto) {
         <a href="/feed/list"><p>피드 작성하러 가기 →</p></a>
       </div>
       `;
-  } else { // 작성한 피드가 존재하면
+  } else { // 작성한 피드가 존재하는 경우
     myFeeds.forEach(f => {
       const {boardId, image, likeCount, bookmarkCount, replyCount} = f;
       tag += `
@@ -76,7 +71,6 @@ function appendMyFeeds(myFeedListDto) {
       `;
     });
   }
-  const $feedTab = document.getElementById('my-feed-tab');
   $feedTab.innerHTML += tag;
 }
 
@@ -107,6 +101,13 @@ async function fetchMyFeedList(account, pageNo = 1) {
   currentMyFeedPage = pageNo;
   isFetchingMyFeed = false;
 
+  $feedTab.addEventListener('click', e => {
+    const feedId = +e.target.closest('.myfeed-item').dataset.feedId;
+    if (!feedId) return;
+
+    window.location.href = `/feed/list?feedId=${feedId}`;
+  });
+
   // 피드 모두 가져오면 스크롤이벤트 제거
   if (loadedMyFeeds >= totalMyFeeds) {
     console.log('마이페이지 피드 모두 가져옴! 스크롤 이벤트 제거')
@@ -130,9 +131,7 @@ const debouncedMyFeedScrollHandler = debounce(async function (e) {
   if (scrollTop + clientHeight + 200 >= scrollHeight
     && !isFetchingMyFeed
   ) {
-    // console.log(e);
     // 서버에서 데이터를 비동기로 불러와야 함
-    // 2초의 대기열이 생성되면 다음 대기열 생성까지 2초를 기다려야 함
     console.log("스크롤 이벤트 핸들러 함수 실행");
     // showSpinner();
     await new Promise(resolve => setTimeout(resolve, 700));
